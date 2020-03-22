@@ -1,0 +1,28 @@
+version: '3.7'
+services:
+  web:
+    image: thebernank/flask:latest
+    networks:
+      - shadow
+  shadow:
+    image: thebernank/flask:latest
+    networks:
+      - shadow
+  envoy:
+    networks:
+      - shadow
+    build:
+      context: ./envoy
+      dockerfile: Dockerfile
+    volumes:
+      - ./envoy/proxy-mirror.yaml:/etc/proxy-mirror.yaml
+    expose:
+      - "80"
+      - "8881"
+    ports: 
+      - 80:80
+      - 8881:8881
+
+networks:
+  shadow:
+    name: shadow

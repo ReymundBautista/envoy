@@ -1,2 +1,2 @@
-# envoy-shadow
-Envoy Shadow Configuration
+# envoy
+Envoy Configurations

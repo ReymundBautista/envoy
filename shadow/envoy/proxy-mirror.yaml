@@ -1,0 +1,47 @@
+admin:
+  access_log_path: "/dev/stdout"
+  address:
+    socket_address:
+      address: 0.0.0.0
+      port_value: 8881
+      
+static_resources:
+  listeners:
+  - address:
+      socket_address:
+        address: 0.0.0.0
+        port_value: 80
+    filter_chains:
+      filters:
+      - name: envoy.http_connection_manager
+        typed_config:
+          "@type": type.googleapis.com/envoy.config.filter.network.http_connection_manager.v2.HttpConnectionManager
+          use_remote_address: true
+          skip_xff_append: false
+          stat_prefix: ingress_http
+          ## Defaults to envoy
+          server_name: "envoy"
+          route_config:
+            name: local_route
+            virtual_hosts:
+            - name: local_service
+              domains: ["*"]
+              routes:
+              - match:
+                  prefix: "/"
+                route:
+                  cluster: web
+                  request_mirror_policies:
+                    cluster: shadow
+                    runtime_fraction: { default_value: { numerator: 100 } }
+          http_filters:
+            - name: envoy.router
+  clusters:
+  - name: web
+    connect_timeout: 5s
+    type: LOGICAL_DNS
+    hosts: [{ socket_address: { address: web, port_value: 80 }}]
+  - name: shadow
+    connect_timeout: 5s
+    type: LOGICAL_DNS
+    hosts: [{ socket_address: { address: shadow, port_value: 80 }}]

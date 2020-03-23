@@ -1,5 +1,5 @@
 # Envoy TLS Upstream
-Front-end proxy Envoy configuration configures end-to-end TLS connection to the upstream cluster.
+Front-end proxy Envoy configuration that configures end-to-end TLS connection to the upstream cluster.
 
 ## Implementation
 This configuration creates an Envoy container that listens on port 443 that will direct traffic via HTTPS to a Flask container that is only accessible from Envoy. Since Envoy is terminating the TLS connection, this configuration requires a server private and public certificate. The certificates generated from this repo will create a cert with two domain names: `app.local` and `app.alternate`. These same certificates will be added to the Flask container which is running `nginx`.

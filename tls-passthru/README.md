@@ -16,7 +16,7 @@ make create-server-certs
 ```
 
 ### Copy Certs
-Once the certs have been generated for the repo, you'll need to copy them into this configuration. Be sure that you are back in the `sni-match` folder and run the following command:
+Once the certs have been generated for the repo, you'll need to copy them into this configuration. Be sure that you are back in the `tls-passthru` folder and run the following command:
 
 ```
 make copy-certs

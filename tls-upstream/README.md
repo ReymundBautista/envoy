@@ -1,4 +1,4 @@
-# Envoy TLS
+# Envoy TLS Upstream
 Front-end proxy Envoy configuration configures end-to-end TLS connection to the upstream cluster.
 
 ## Implementation

@@ -1,0 +1,20 @@
+version: '3.7'
+services:
+  app:
+    image: thebernank/flask:latest
+  app2:
+    image: thebernank/flask:latest
+  envoy:
+    build:
+      context: ./envoy
+      dockerfile: Dockerfile
+    volumes:
+      - ./envoy/proxy-sni-match.yaml:/etc/proxy-sni-match.yaml
+      - ./certs/app.crt:/etc/app.crt
+      - ./certs/app.key:/etc/app.key
+    expose:
+      - "443"
+      - "8881"
+    ports: 
+      - 443:443
+      - 8881:8881

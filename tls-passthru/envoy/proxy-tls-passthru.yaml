@@ -1,0 +1,38 @@
+admin:
+    access_log_path: "/dev/stdout"
+    address:
+      socket_address:
+        address: 0.0.0.0
+        port_value: 8881
+    
+static_resources:
+  listeners:
+  - address:
+      socket_address:
+        address: 0.0.0.0
+        port_value: 443
+    listener_filters:
+    - name: envoy.listener.tls_inspector
+      typed_config: {}
+    filter_chains:
+    - filter_chain_match:
+        transport_protocol: tls
+        server_names:
+        - "app.local"
+        - "app.alternate"
+      filters:
+      - name: envoy.tcp_proxy
+        config:
+          stat_prefix: ingress_tcp
+          cluster: app
+          access_log:
+            - name: envoy.file_access_log
+              config:
+                path: "/dev/stdout"
+
+  clusters:
+  - name: app
+    connect_timeout: 5s
+    type: LOGICAL_DNS
+    hosts: [{ socket_address: { address: app, port_value: 443 }}]
+  

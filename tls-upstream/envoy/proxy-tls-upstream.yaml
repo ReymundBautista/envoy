@@ -1,0 +1,58 @@
+admin:
+    access_log_path: "/dev/stdout"
+    address:
+      socket_address:
+        address: 0.0.0.0
+        port_value: 9901
+    
+static_resources:
+  listeners:
+  - address:
+      socket_address:
+        address: 0.0.0.0
+        port_value: 443
+    filter_chains:
+    - transport_socket:
+        name: envoy.transport_sockets.tls
+        typed_config:
+          "@type": type.googleapis.com/envoy.api.v2.auth.DownstreamTlsContext
+          common_tls_context:
+            tls_certificates:
+            - certificate_chain: { filename: "/etc/app.crt" }
+              private_key: { filename: "/etc/app.key" }
+            alpn_protocols: [ "h2,http/1.1" ]
+      filters:
+      - name: envoy.http_connection_manager
+        typed_config:
+          "@type": type.googleapis.com/envoy.config.filter.network.http_connection_manager.v2.HttpConnectionManager
+          use_remote_address: true
+          skip_xff_append: false
+          stat_prefix: ingress_http
+          access_log:
+            - name: envoy.file_access_log
+              config:
+                path: "/dev/stdout"
+          xff_num_trusted_hops: 2
+          server_name: "envoy-tls-upstream"
+          route_config:
+            name: local_route
+            virtual_hosts:
+            - name: local_service
+              domains: ["*"]
+              routes:
+              - match:
+                  prefix: "/"
+                route:
+                  cluster: app
+          http_filters:
+            - name: envoy.router
+  clusters:
+  - name: app
+    connect_timeout: 5s
+    type: LOGICAL_DNS
+    hosts: [{ socket_address: { address: app, port_value: 443 }}]
+    transport_socket:
+      name: envoy.transport_sockets.tls
+      typed_config:
+        "@type": type.googleapis.com/envoy.api.v2.auth.UpstreamTlsContext
+  

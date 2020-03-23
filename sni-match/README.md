@@ -1,4 +1,4 @@
-# Envoy TLS
+# Envoy SNI Matching
 Front-end proxy Envoy configuration that accepts TLS connections and routes traffic based on SNI hostname.
 
 ## Implementation

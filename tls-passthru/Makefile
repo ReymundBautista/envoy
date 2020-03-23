@@ -1,6 +1,6 @@
 .PHONY: build-all build test tag_latest_all release ssh
 
-APP="tls-upstream"
+APP="tls-passthru"
 
 help:
 	@echo "General Commands"
@@ -13,7 +13,7 @@ help:
 	@echo "    verify-config"
 	@echo ""
 	@echo "Build Flask App:"
-	@echo      build"
+	@echo "    build"
 	@echo ""
 	@echo "Run Envoy:"
 	@echo "    run"
@@ -34,12 +34,10 @@ copy-certs:
 
 verify-config:
 	@docker run --rm -v "`pwd`/envoy/proxy-$(APP).yaml":/etc/proxy-$(APP).yaml \
-	                 -v "`pwd`/certs/app.key":/etc/app.key \
-					 -v "`pwd`/certs/app.crt":/etc/app.crt \
-					 envoyproxy/envoy-alpine:latest envoy -c /etc/proxy-$(APP).yaml --mode validate 
+		envoyproxy/envoy-alpine:latest envoy -c /etc/proxy-$(APP).yaml --mode validate 
 
 build:
-	@docker-compose -p envoy-$(APP) build
+	@docker-compose -p envoy-$(APP) build --no-cache
 
 run:
 	@docker-compose -p envoy-$(APP) up -d --force-recreate
@@ -49,8 +47,14 @@ stop:
 
 rebuild: stop run
 
-test:
+test-envoy:
 	@echo "HINT: Make sure you set app.local to 127.0.0.1 in your hosts file!"
 	@echo ""
 	@echo "Running command: curl --cacert ../certs/CA.crt  https://app.local"
 	@curl --cacert ../certs/CA.crt  https://app.local
+
+test-app-directly:
+	@echo "HINT: Make sure you set app.local to 127.0.0.1 in your hosts file!"
+	@echo ""
+	@echo "Running command: curl --cacert ../certs/CA.crt  https://app.local:8443"
+	@curl --cacert ../certs/CA.crt  https://app.local:8443

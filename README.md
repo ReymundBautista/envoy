@@ -13,5 +13,6 @@ I've been running these configurations on MacOS Catalina. You'll want to ensure 
 ## Current configurations
 * [shadow](shadow)
 * [sni-match](sni-match)
+* [tls-passthru](tls-passthru)
 * [tls-terminate](tls-terminate)
 * [tls-upstream](tls-upstream)

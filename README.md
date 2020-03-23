@@ -14,3 +14,4 @@ I've been running these configurations on MacOS Catalina. You'll want to ensure 
 * [shadow](shadow)
 * [sni-match](sni-match)
 * [tls-terminate](tls-terminate)
+* [tls-upstream](tls-upstream)

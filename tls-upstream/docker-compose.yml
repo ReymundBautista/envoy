@@ -1,0 +1,23 @@
+version: '3.7'
+services:
+  app:
+    build:
+      context: ./flask-tls
+      dockerfile: Dockerfile
+    volumes:
+      - ./certs/app.crt:/etc/ssl/app.crt
+      - ./certs/app.key:/etc/ssl/app.key
+  envoy:
+    build:
+      context: ./envoy
+      dockerfile: Dockerfile
+    volumes:
+      - ./envoy/proxy-tls.yaml:/etc/proxy-tls.yaml
+      - ./certs/app.crt:/etc/app.crt
+      - ./certs/app.key:/etc/app.key
+    expose:
+      - "443"
+      - "8881"
+    ports: 
+      - 443:443
+      - 8881:8881

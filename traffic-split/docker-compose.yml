@@ -1,0 +1,20 @@
+version: '3.7'
+services:
+  web1:
+    image: thebernank/flask:latest
+  web2:
+    image: thebernank/flask:latest
+  web3:
+    image: thebernank/flask:latest
+  envoy:
+    build:
+      context: ./envoy
+      dockerfile: Dockerfile
+    volumes:
+      - ./envoy/envoy-proxy.yaml:/etc/envoy-proxy.yaml
+    expose:
+      - "80"
+      - "8881"
+    ports: 
+      - 80:80
+      - 8881:8881

@@ -1,4 +1,4 @@
-VERSION = 0.1
+VERSION = 0.2
 
 ## Use cache by default.  You can override the user via the commandline:  make target CACHE="--no-cache"
 CACHE =

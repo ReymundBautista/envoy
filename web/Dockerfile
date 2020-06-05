@@ -10,3 +10,4 @@ VOLUME /app
 ADD flask /app
 ADD requirements.txt /var/www/requirements.txt
 RUN pip install -r /var/www/requirements.txt
+COPY nginx/*.conf /etc/nginx/conf.d/

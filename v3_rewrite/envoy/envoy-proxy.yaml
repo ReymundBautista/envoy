@@ -1,0 +1,82 @@
+admin:
+  access_log_path: "/dev/stdout"
+  address:
+    socket_address:
+      address: 0.0.0.0
+      port_value: 8881
+      
+static_resources:
+  listeners:
+  - name: http_listener
+    address:
+      socket_address:
+        address: 0.0.0.0
+        port_value: 80
+    filter_chains:
+      filters:
+      - name: envoy.filters.network.http_connection_manager
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+          stat_prefix: ingress_http
+          codec_type: AUTO
+          ## Defaults to envoy
+          server_name: "envoy"
+          route_config:
+            name: local_route
+            virtual_hosts:
+            - name: host_rewrite_example
+              domains: ["app.local"]
+              routes:
+              ## Match rules are process in order!
+              - match:
+                  prefix: "/rewrite-header"
+                route:
+                  host_rewrite_literal: "app.newhostheader"
+                  cluster: web
+              - match:
+                  prefix: "/"
+                route:
+                  host_rewrite_literal: "app.new"
+                  cluster: web
+            - name: prefix_rewrite_example
+              domains: ["app.alternate"]
+              routes:
+              ## Match rules are process in order!
+              - match:
+                  prefix: "/rewrite-prefix"
+                route:
+                  prefix_rewrite: "/prefix-has-been-rewritten"
+                  cluster: web2
+              - match:
+                  prefix: "/"
+                route:
+                  cluster: web2
+
+
+          http_filters:
+            - name: envoy.filters.http.router
+  clusters:
+  - name: web
+    connect_timeout: 5s
+    type: LOGICAL_DNS
+    load_assignment:
+      cluster_name: web
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: web
+                port_value: 80
+  - name: web2
+    connect_timeout: 5s
+    type: LOGICAL_DNS
+    load_assignment:
+      cluster_name: web2
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: web2
+                port_value: 80
